@@ -1,0 +1,15 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: webhook-listener-virtual-service
+spec:
+  hosts: 
+  - webhook-listener-service.andrew-scribner.svc.cluster.local
+  tcp:
+    - match:
+      - port: 5000
+      route:
+      - destination:
+          host: webhook-listener-service.andrew-scribner.svc.cluster.local
+          port:
+            number: 5000
