@@ -69,7 +69,8 @@ Trying this we get...
 
 ```
 # with http:
-curl -v --header "Content-Type: application/json" --header "kubeflow-userid: andrew.scribner@cloud.statcan.ca" -d "{\"value\":\"test\"}" http://webhook-listener-service.andrew-scribner.svc.cluster.local:5000/webhook
+USERID=andrew.scribner@cloud.statcan.ca
+curl -v --header "Content-Type: application/json" --header "kubeflow-userid: $USERID" -d "{\"value\":\"test\"}" http://webhook-listener-service.$NAMESPACE.svc.cluster.local:5000/webhook
 #	*   Trying 10.0.135.134:5000...
 #	* Connected to webhook-listener-service.andrew-scribner.svc.cluster.local (10.0.135.134) port 5000 (#0)
 #	> POST /webhook HTTP/1.1
@@ -85,13 +86,28 @@ curl -v --header "Content-Type: application/json" --header "kubeflow-userid: and
 #	* Connection #0 to host webhook-listener-service.andrew-scribner.svc.cluster.local left intact
 #	curl: (52) Empty reply from server
 
-http:
-different usename:
-	curl -v --header "Content-Type: application/json" --header "kubeflow-userid: andrew.scribner" -d "{\"value\":\"test\"}" http://webhook-listener-service.andrew-scribner.svc.cluster.local:5000/webhook
-	-- curl: (52) Empty reply from server
+# http:
+# different usename:
+USERID=andrew.scribner
+curl -v --header "Content-Type: application/json" --header "kubeflow-userid: $USERID" -d "{\"value\":\"test\"}" http://webhook-listener-service.$NAMESPACE.svc.cluster.local:5000/webhook
+#	*   Trying 10.0.135.134:5000...
+#	* Connected to webhook-listener-service.andrew-scribner.svc.cluster.local (10.0.135.134) port 5000 (#0)
+#	> POST /webhook HTTP/1.1
+#	> Host: webhook-listener-service.andrew-scribner.svc.cluster.local:5000
+#	> User-Agent: curl/7.69.1
+#	> Accept: */*
+#	> Content-Type: application/json
+#	> kubeflow-userid: andrew.scribner
+#	> Content-Length: 16
+#	> 
+#	* upload completely sent off: 16 out of 16 bytes
+#	* Empty reply from server
+#	* Connection #0 to host webhook-listener-service.andrew-scribner.svc.cluster.local left intact
+#	curl: (52) Empty reply from server
 
-https:
-curl -v --header "Content-Type: application/json" --header "kubeflow-userid: andrew.scribner@cloud.statcan.ca" -d "{\"value\":\"test\"}" https://webhook-listener-service.andrew-scribner.svc.cluster.local:5000/webhook
+# https:
+USERID=andrew.scribner@cloud.statcan.ca
+curl -v --header "Content-Type: application/json" --header "kubeflow-userid: $USERID" -d "{\"value\":\"test\"}" https://webhook-listener-service.$NAMESPACE.svc.cluster.local:5000/webhook
 #	*   Trying 10.0.135.134:5000...
 #	* Connected to webhook-listener-service.andrew-scribner.svc.cluster.local (10.0.135.134) port 5000 (#0)
 #	* ALPN, offering http/1.1
@@ -103,3 +119,6 @@ curl -v --header "Content-Type: application/json" --header "kubeflow-userid: and
 #	* Closing connection 0
 #	curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to webhook-listener-service.andrew-scribner.svc.cluster.local:5000 
 ```
+
+
+Based on [this](https://github.com/kubeflow/kfserving/blob/master/docs/samples/istio-dex/README.md) I tried adding the authservice_session cookie (copy/pasted from browser session) but it didn't work either.  Not sure what else we're missing.  I saw one place talking about KUBEFLOW_USERID rather than kubeflow-userid so maybe that's the missing piece, but I didn't think so.  
